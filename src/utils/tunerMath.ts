@@ -7,7 +7,7 @@ export const A4 = 440;
 
 const MIN_FREQ = 50; // Hz, lowest pitch we look for
 const MAX_FREQ = 2000; // Hz, highest pitch we look for
-const YIN_THRESHOLD = 0.15; // lower = stricter, fewer false detections
+const DEFAULT_YIN_THRESHOLD = 0.15; // lower = stricter, fewer false detections
 
 export interface NoteReading {
   /** Note name without octave, e.g. "C#" */
@@ -53,6 +53,7 @@ export interface DetectedPitch {
 export function detectPitch(
   buffer: Float32Array,
   sampleRate: number,
+  threshold: number = DEFAULT_YIN_THRESHOLD,
 ): DetectedPitch | null {
   const half = Math.floor(buffer.length / 2);
   const minTau = Math.max(2, Math.floor(sampleRate / MAX_FREQ));
@@ -75,7 +76,7 @@ export function detectPitch(
   // Step 3: first dip below the threshold, then walk down to its bottom
   let found = -1;
   for (let tau = minTau; tau <= maxTau; tau++) {
-    if (cmnd[tau] < YIN_THRESHOLD) {
+    if (cmnd[tau] < threshold) {
       while (tau + 1 <= maxTau && cmnd[tau + 1] < cmnd[tau]) tau++;
       found = tau;
       break;
@@ -94,4 +95,23 @@ export function detectPitch(
     frequency: sampleRate / refined,
     clarity: Math.max(0, Math.min(1, 1 - s1)),
   };
+}
+
+/**
+ * Sensitivity runs from 0 (needs loud sound) to 1 (hears very quiet sound).
+ * This is the volume below which the input is treated as silence.
+ */
+export function sensitivityToGate(sensitivity: number): number {
+  return 0.03 * Math.pow(0.001 / 0.03, sensitivity);
+}
+
+/** Higher sensitivity also accepts slightly noisier sound as a clear pitch. */
+export function sensitivityToThreshold(sensitivity: number): number {
+  return 0.12 + 0.12 * sensitivity;
+}
+
+/** Turns a volume (0 to 1) into a 0 to 1 position on the level meter. */
+export function volumeToMeter(volume: number): number {
+  const decibels = 20 * Math.log10(Math.max(volume, 1e-5));
+  return Math.min(1, Math.max(0, (decibels + 70) / 60));
 }

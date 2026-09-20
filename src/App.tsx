@@ -2,6 +2,7 @@ import { useCallback, useEffect, useMemo, useRef, useState } from 'react';
 import './App.css';
 import { AudioEngine } from './audio/AudioEngine';
 import AboutRubab from './components/AboutRubab';
+import MetronomePanel from './components/MetronomePanel';
 import PitchTrace from './components/PitchTrace';
 import RaagPanel from './components/RaagPanel';
 import TanpuraPanel from './components/TanpuraPanel';
@@ -156,6 +157,7 @@ export default function App() {
             raagId={raagId}
             onRaagChange={setRaagId}
           />
+          <MetronomePanel />
           <TanpuraPanel saNote={saNote} />
         </aside>
       </div>

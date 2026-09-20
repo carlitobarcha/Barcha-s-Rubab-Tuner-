@@ -1,9 +1,17 @@
 import type { PitchData } from '../types/tuner';
-import { detectPitch } from '../utils/tunerMath';
+import {
+  detectPitch,
+  sensitivityToGate,
+  sensitivityToThreshold,
+} from '../utils/tunerMath';
 
 const FFT_SIZE = 4096; // ~93 ms of audio at 44.1 kHz, good for low notes
-const SILENCE_RMS = 0.01; // below this volume we treat it as silence
-const MIN_CLARITY = 0.85; // ignore unclear/noisy detections
+
+// Always maximum sensitivity: the tuner hears very quiet sound.
+// 0 = needs loud sound, 1 = hears very quiet sound.
+const SENSITIVITY = 1;
+const SILENCE_RMS = sensitivityToGate(SENSITIVITY);
+const YIN_THRESHOLD = sensitivityToThreshold(SENSITIVITY);
 
 /** Called about 60 times a second. `null` means nothing clear is playing. */
 type PitchCallback = (data: PitchData | null) => void;
@@ -66,8 +74,12 @@ export class AudioEngine {
     if (volume < SILENCE_RMS) {
       this.onPitch(null);
     } else {
-      const result = detectPitch(this.buffer, this.context.sampleRate);
-      if (result && result.clarity >= MIN_CLARITY) {
+      const result = detectPitch(
+        this.buffer,
+        this.context.sampleRate,
+        YIN_THRESHOLD,
+      );
+      if (result) {
         this.onPitch({ pitch: result.frequency, clarity: result.clarity, volume });
       } else {
         this.onPitch(null);

@@ -26,13 +26,15 @@ export default function AboutRubab() {
           <h2 id="about-title" className="about-title">
             About the Rubab
           </h2>
-          <p className="about-subtitle">THE LION OF INSTRUMENTS</p>
+          <p className="about-subtitle">THE LION OF INSTRUMENTS | THE DOOR TO SOUL</p>
+           
 
           <p className="about-text">
-            The rubab is a short-necked, plucked lute and one of the national
-            instruments of Afghanistan. It is also played in the Pashtun regions
-            of Pakistan, in Kashmir and across Central Asia, and it is
-            regarded as an ancestor of the Indian sarod.
+                        The rubab is a short-necked, plucked lute and one of the national
+            instruments of Afghanistan. Its name is often loosely translated as
+            the door to the soul. It is also played in the Pashtun regions of
+            Pakistan, in Kashmir and across Central Asia, and it is regarded as
+            an ancestor of the Indian sarod.
           </p>
           <p className="about-text">
             Its body is carved from a single piece of mulberry wood in two
